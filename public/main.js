@@ -26,14 +26,13 @@ api.setEventHandler((events) => {
 setInterval(() => {
   if(agQueue.length > 0 && !isPossiblyAnimatingGift()) {
     const ag = agQueue.shift();
+a65edfad8e740abd580040
 
     animateGift(ag);
   } 
   else if(mQueue.length > 0) {
     // Uncomment below line after you read PERSONEL NOTE
-    // const m = getSyncedMessage(); 
-
-    // Comment below line after you read PERSONEL NOTE
+    // const m =     // Comment below line after you read PERSONEL NOTE
     const m = mQueue.shift();
 
     addMessage(m);
@@ -44,10 +43,8 @@ setInterval(() => {
     addMessage(g);
   }
 }, 500);
-
-/**
- * PERSONEL NOTE (MK)
- * I'm note sure about the `Events with the type `MESSAGE` older than 20 seconds should not be shown to the user.` option.
+a65edfad8e740abd580040
+e type `MESSAGE` older than 20 seconds should not be shown to the user.` option.
  * So I added commented lines as an alternative and you can check it by uncommenting those lines if that's the expectation
  */
 
