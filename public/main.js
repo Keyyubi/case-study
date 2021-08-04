@@ -20,27 +20,30 @@ api.setEventHandler((events) => {
         break;
     };
   });
-
-  setInterval(() => {
-    if(agQueue.length > 0 && !isPossiblyAnimatingGift()) {
-      const ag = agQueue.shift();
-      animateGift(ag);
-    } 
-    else if(mQueue.length > 0) {
-      // Uncomment below line after you read PERSONEL NOTE
-      // const m = getSyncedMessage(); 
-
-      // Comment below line after you read PERSONEL NOTE
-      const m = mQueue.shift();
-
-      addMessage(m);
-    }
-    else if(gQueue.length>0) {
-      const g = gQueue.shift();
-      addMessage(g);
-    }
-  }, 500);
 })
+
+// Showing 1 event in every 500ms
+setInterval(() => {
+  if(agQueue.length > 0 && !isPossiblyAnimatingGift()) {
+    const ag = agQueue.shift();
+
+    animateGift(ag);
+  } 
+  else if(mQueue.length > 0) {
+    // Uncomment below line after you read PERSONEL NOTE
+    // const m = getSyncedMessage(); 
+
+    // Comment below line after you read PERSONEL NOTE
+    const m = mQueue.shift();
+
+    addMessage(m);
+  }
+  else if(gQueue.length>0) {
+    const g = gQueue.shift();
+
+    addMessage(g);
+  }
+}, 500);
 
 /**
  * PERSONEL NOTE (MK)
