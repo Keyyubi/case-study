@@ -24,6 +24,7 @@ api.setEventHandler((events) => {
   setInterval(() => {
     if(agQueue.length > 0 && !isPossiblyAnimatingGift()) {
       const ag = agQueue.shift();
+      
       animateGift(ag);
     } 
     else if(mQueue.length > 0) {
@@ -37,6 +38,7 @@ api.setEventHandler((events) => {
     }
     else if(gQueue.length>0) {
       const g = gQueue.shift();
+      
       addMessage(g);
     }
   }, 500);
