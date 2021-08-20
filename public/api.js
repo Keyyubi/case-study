@@ -140,7 +140,6 @@ export class APIWrapper {
         try {
           that.eventHandler(events);
         } catch (error) {
-          debugger;
           console.error("eventHandler error", error);
         }
       }
