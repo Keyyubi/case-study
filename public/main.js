@@ -4,67 +4,66 @@ import { APIWrapper, API_EVENT_TYPE } from "./api.js";
 import { addMessage, animateGift, isPossiblyAnimatingGift, isAnimatingGiftUI } from "./dom_updates.js";
 
 const api = new APIWrapper();
-let agQueue = [], mQueue = [], gQueue = [];
+let agQueue = [], eQueue = [];
 
 api.setEventHandler((events) => {
-  events.forEach(e => {
-    switch (e.type) {
-      case API_EVENT_TYPE.ANIMATED_GIFT:
-        agQueue.push(e);
-        break;
-      case API_EVENT_TYPE.MESSAGE:
-        mQueue.push(e);
-        break;
-      case API_EVENT_TYPE.GIFT:
-        gQueue.push(e);
-        break;
-    };
-  });
+  if (events.length > 0) {
+    if (agQueue.length === 0) {
+      const index = events.findIndex(e => e.type === API_EVENT_TYPE.ANIMATED_GIFT);
+      const event = events.splice(index, 1)[0];
+
+      animateGift(event);
+    }
+
+    if (eQueue.length === 0) {
+      const index = events.findIndex(e => e.type !== API_EVENT_TYPE.ANIMATED_GIFT);
+      const event = events.splice(index, 1)[0];
+
+      addMessage(event);
+    }
+
+    events.forEach(e => {
+      switch (e.type) {
+        case API_EVENT_TYPE.ANIMATED_GIFT:
+          agQueue.push(e);
+          break;
+        default:
+          eQueue.push(e);
+          break;
+      };
+    });
+  }
 })
 
-// Showing 1 event in every 500ms
+// Showing one event at most in every 500ms
 setInterval(() => {
   if (agQueue.length > 0 && !isPossiblyAnimatingGift()) {
     const ag = agQueue.shift();
 
     animateGift(ag);
   }
-  else if (mQueue.length > 0) {
-    // Uncomment below line after you read PERSONEL NOTE
-    // const m = getSyncedMessage(); 
+  if (eQueue.length > 0) {
+    // Gets MESSAGE events newer than 20 sec.
+    const e = getSyncedMessage();
 
-    // Comment below line after you read PERSONEL NOTE
-    const m = mQueue.shift();
-
-    addMessage(m);
-  }
-  else if (gQueue.length > 0) {
-    const g = gQueue.shift();
-
-    addMessage(g);
+    addMessage(e);
   }
 }, 500);
 
 /**
- * PERSONEL NOTE (MK)
- * I'm note sure about the `Events with the type `MESSAGE` older than 20 seconds should not be shown to the user.` option.
- * So I added commented lines as an alternative and you can check it by uncommenting those lines if that's the expectation
- */
-
-/**
  * @function getSyncedMessage
- * @description Finds the first message in the queue that's newer than 20 seconds. Uncomment the function if it's neccesary
+ * @description If the eventType is MESSAGE checks wheter is the event newer than 20 seconds. If eventType is not MESSAGE returns the event immediately
  */
-// const getSyncedMessage = () => {
-//   const m = mQueue.shift();
-//   const now = new Date();
-//   const mDate = new Date(m.timestamp);
-//   const diff = (now.getTime() - mDate.getTime()) / 1000; // => as seconds
-//   if(Math.abs(diff) > 20) {
-//     getSyncedMessage();
-//   } else {
-//     return m;
-//   }
-// }
-
-// NOTE: UI helper methods from `dom_updates` are already imported above.
+const getSyncedMessage = () => {
+  const e = eQueue.shift();
+  if (e.type == API_EVENT_TYPE.MESSAGE) {
+    const now = new Date();
+    const eDate = new Date(e.timestamp);
+    const diff = (now.getTime() - eDate.getTime()) / 1000; // => as seconds
+    if (Math.abs(diff) > 20) {
+      getSyncedMessage();
+    }
+    return e;
+  }
+  return e;
+}
